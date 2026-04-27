@@ -24,14 +24,14 @@ Los commits deberán tener el siguiente formato para mayor claridad:
 La creación de un bot de ajedrez se divide en las siguientes grandes áreas:
 
 1. Representación del tablero: crear una representación del tablero libre de bugs y que siga las reglas del ajedrez.
-  - Board: se necesita una clase que represente el tablero con todas las reglas (esto incluye mantener constancia de repetición de movimientos para el empate por 3 repeticiones, la cantidad de movimientos para el empate por 50 turnos sin captura, el último peón que se movió doble para el _en passant_, los derecho de enroque, el turno, etc.)
-  - Bitboards: las piezas se representan como una colección de bits, en particular, un int de 64 bits, donde el bit menos significativo es la esquina inferior derecha del tablero y el más significativo es la esquina superior izquierda. Un 1 implica la presencia de una pieza en esa posición y un 0, lo contrario.
-  - make_move(move)/unmake_move(move): una función que haga y deshaga movimientos. Se debe mantener un stack de todos los movimientos hechos en Board para poder deshacerlos uno a uno.
-  - Una función que determine si el rey de cierto color está en jaque (para revisar legalidad).
+    - Board: se necesita una clase que represente el tablero con todas las reglas (esto incluye mantener constancia de repetición de movimientos para el empate por 3 repeticiones, la cantidad de movimientos para el empate por 50 turnos sin captura, el último peón que se movió doble para el _en passant_, los derecho de enroque, el turno, etc.)
+    - Bitboards: las piezas se representan como una colección de bits, en particular, un int de 64 bits, donde el bit menos significativo es la esquina inferior derecha del tablero y el más significativo es la esquina superior izquierda. Un 1 implica la presencia de una pieza en esa posición y un 0, lo contrario.
+    - make_move(move)/unmake_move(move): una función que haga y deshaga movimientos. Se debe mantener un stack de todos los movimientos hechos en Board para poder deshacerlos uno a uno.
+    - Una función que determine si el rey de cierto color está en jaque (para revisar legalidad).
 2. Generación de movimientos: es necesaria para que el bot elija un movimiento y pueda analizar movimientos futuros.
-  - Generar todos los movimientos pseudolegales a partir de una posición.
-  - Generar todos los movimientos legales a partir de una posición.
-  - Funciones para obtener los movimientos de piezas específicas en tiempo constante.
+    - Generar todos los movimientos pseudolegales a partir de una posición.
+    - Generar todos los movimientos legales a partir de una posición.
+    - Funciones para obtener los movimientos de piezas específicas en tiempo constante.
 3. Evaluación: Debemos ser capaces de evaluar la ventaja o desventaja de cierta posición. Esto se divide en una gran cantidad de subtareas, ya que la ventaja de una posición se determina a partir de muchas variables.
 4. Búsqueda: Se hace con un tipo de _backtracking_ conocido como _negamax search_ o _alpha beta pruning_ que consiste en recorrer todas las posibles jugadas hasta cierta profundidad y evaluarlas, podando las ramas que son peores que las que ya visitamos. Lo importante aquí es optimizar lo más posible, ya que para profundidades altas este algoritmo llega a ser O(n^n). Hay varias maneras de hacer esto.
 
