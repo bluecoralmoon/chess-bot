@@ -39,3 +39,4 @@ La creación de un bot de ajedrez se divide en las siguientes grandes áreas:
 
 5. UCI + Manejo de tiempo: UCI es el formato estándar para que un bot de ajedrez se comunique con otras interfaces. Esto nos serviría para enfrentarlo a otros bots y medir su Elo, entre otras cosas.
 6. Testing científico: Simular partidas contra Stockfish u otros bots para determinar si un cambio realmente mejora el Elo del bot. Incluye otras cosas, como el análisis estadístico de bases de datos de partidas y el uso de Machine Learning para el aprendizaje y testeo del bot.
+7. Interfaz gráfica: La creación de una interfaz gráfica facilitaría mucho nuestro trabajo para no tener que representar el tablero de ajedrez en la terminal y para poder mover las piezas con el mouse, entre otras cosas.
