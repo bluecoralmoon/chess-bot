@@ -143,6 +143,10 @@ class Board:
         if not re.match(fen_regex, fen):
             return False
         
+        if ("p" in fen.split()[0].split("/")[0].lower() or
+            "p" in fen.split()[0].split("/")[7].lower()):
+            return False
+        
         k = 0
         K = 0
         n_squares = 0
@@ -155,7 +159,7 @@ class Board:
                 n_squares += 1
             if c.isnumeric():
                 n_squares += int(c)
-
+        
         if n_squares != 64 or k != 1 or K != 1:
             return False
 
@@ -243,7 +247,7 @@ if __name__ == "__main__":
     b = Board()
     print(b)
     success = b.from_fen(fen_pos="rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
-    print(f"¿FUNCIONO LA IMPORTACION DE FEN?: {success}")
+    print(f"¿FUNCIONO LA IMPORTACION DE FEN rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1?: {success}")
     print(b)
     assert b.occupancy == 0xFFFF00000000FFFF
     assert b.all_white == 0x000000000000FFFF
@@ -262,7 +266,7 @@ if __name__ == "__main__":
     assert b.black_king == 0x0800000000000000
     assert b.board_state == 30
 
-    from debug import print_board
+    from debug import print_board, print_board_state
 
     print_board(b.white_pawns)
     print()
@@ -271,8 +275,17 @@ if __name__ == "__main__":
     print()
 
     success = b.from_fen(fen_pos="8/1kB1Rq2/N2r2Q1/b5n1/1p3Q2/2P1q3/3K4/8 b - - 31 121")
-    print(f"¿FUNCIONO LA IMPORTACION DE FEN?: {success}")
+    print(f"¿FUNCIONO LA IMPORTACION DE FEN? 8/1kB1Rq2/N2r2Q1/b5n1/1p3Q2/2P1q3/3K4/8 b - - 31 121: {success}")
     b.visualize_board()
+    print_board_state(b.board_state)
+    print()
+
+    print(b.to_fen())
+
+    success = b.from_fen(fen_pos="3Pp3/8/8/1K3k2/8/8/8/3P2p1 w - - 0 1")
+    print(f"¿FUNCIONO LA IMPORTACION DE FEN 3Pp3/8/8/1K3k2/8/8/8/3P2p1 w - - 0 1?: {success}")
+    b.visualize_board()
+    print_board_state(b.board_state)
     print()
 
     print(b.to_fen())
