@@ -45,9 +45,10 @@ class Board:
     def from_fen(self, fen_pos: str = '') -> bool:
         '''Carga la posición de `self.fen` o, si existe, `fen_pos`.\n
         `fen_pos` debe estar en formato FEN.\n
-        Retorna `True` si fue exitoso y `False` en caso contrario.'''
+        Retorna `True` si fue exitoso y `False` en caso contrario.\n
+        En caso de ser exitoso, guarda `fen_pos` en `self.fen`.'''
 
-        fen = self.fen if self.fen else fen_pos
+        fen = fen_pos if fen_pos else self.fen
         if not self.check_fen_format(fen): return False
 
         self.reset_bitboards()
@@ -117,10 +118,11 @@ class Board:
                     square -= 1
 
         self.update_occupancy()
+        self.fen = fen
 
         return True
 
-    def square_to_index(square: str) -> int:
+    def square_to_index(self, square: str) -> int:
         '''Transforma el nombre de una casilla a su índice.
         
         Ej. `"e4"` -> `27`.
@@ -130,7 +132,18 @@ class Board:
             or square[0] not in "abcdefgh" or square[1] not in "12345678"):
             return -1
         
-        return "abcdefgh".index(square[0]) * 8 + int(square[1]) - 1
+        return int(square[1]) * 8 - "abcdefgh".index(square[0]) - 1
+    
+    def index_to_square(self, index: int) -> str | None:
+        '''Transforma el índice de una casilla a su nombre.
+        
+        Ej. `27` -> `"e4"`.
+        Retorna `None` en caso de error.'''
+
+        if (type(index) != int or index < 0 or index > 63):
+            return None
+        
+        return ("abcdefgh"[::-1])[index % 8] + str(index // 8 + 1)
 
     def check_fen_format(self, fen: str) -> bool:
         '''Retorna `True` si el string el cumple formato FEN
@@ -188,7 +201,92 @@ class Board:
     def to_fen(self) -> str:
         '''Transforma la posición actual a formato FEN y la retorna.'''
 
-        return NotImplemented
+        fen = ""
+
+        # Piezas
+        contador = 0
+        for sq in range(63, -1, -1):
+            if not self.occupancy & (1 << sq):
+                contador += 1
+            else:
+                if contador != 0:
+                    fen += str(contador)
+                contador = 0
+                if (self.white_pawns & (1 << sq)):
+                    fen += "P"
+                elif (self.white_knights & (1 << sq)):
+                    fen += "N"
+                elif (self.white_bishops & (1 << sq)):
+                    fen += "B"
+                elif (self.white_rooks & (1 << sq)):
+                    fen += "R"
+                elif (self.white_queens & (1 << sq)):
+                    fen += "Q"
+                elif (self.white_king & (1 << sq)):
+                    fen += "K"
+                elif (self.black_pawns & (1 << sq)):
+                    fen += "p"
+                elif (self.black_knights & (1 << sq)):
+                    fen += "n"
+                elif (self.black_bishops & (1 << sq)):
+                    fen += "b"
+                elif (self.black_rooks & (1 << sq)):
+                    fen += "r"
+                elif (self.black_queens & (1 << sq)):
+                    fen += "q"
+                elif (self.black_king & (1 << sq)):
+                    fen += "k"
+            
+            if sq != 0 and sq % 8 == 0:
+                if contador != 0:
+                    fen += str(contador)
+                contador = 0
+                fen += "/"
+            if sq == 0:
+                if contador != 0:
+                    fen += str(contador)
+                contador = 0
+                fen += " "
+        
+        # Turno
+        fen += "b" if self.board_state & 1 else "w"
+        fen += " "
+
+        # Enroque
+        K = self.board_state & 1 << 1
+        Q = self.board_state & 1 << 2
+        k = self.board_state & 1 << 3
+        q = self.board_state & 1 << 4
+        if not (K or Q or k or q):
+            fen += "-"
+        else:
+            if K:
+                fen += "K"
+            if Q:
+                fen += "Q"
+            if k:
+                fen += "k"
+            if q:
+                fen += "q"
+        fen += " "
+
+        # En passant
+        en_passant_sq = self.board_state >> 5 & ((1 << 6) - 1)
+        if en_passant_sq == 0:
+            fen += "-"
+        else:
+            fen += self.index_to_square(en_passant_sq)
+        fen += " "
+
+        # Halfmove clock
+        halfmove_clock = self.board_state >> 11 & ((1 << 6) - 1)
+        fen += str(halfmove_clock)
+        fen += " "
+
+        # Fullmove number
+        fen += str(self.fullmove_number)
+
+        return fen
     
     def update_occupancy(self) -> None:
         '''Actualiza `all_white`, `all_black` y `occupancy`.'''
@@ -240,10 +338,11 @@ class Board:
                 
                 square -= 1
 
-            print(8 - rank, '|', ' '.join(row))
-            
+            print(8 - rank, '|', ' '.join(row))      
 
-if __name__ == "__main__":
+def test_board():
+    # Creé este test para probarlo usando "pytest"
+    # Es bastante útil para debuggear
     b = Board()
     print(b)
     success = b.from_fen(fen_pos="rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
@@ -278,9 +377,11 @@ if __name__ == "__main__":
     print(f"¿FUNCIONO LA IMPORTACION DE FEN? 8/1kB1Rq2/N2r2Q1/b5n1/1p3Q2/2P1q3/3K4/8 b - - 31 121: {success}")
     b.visualize_board()
     print_board_state(b.board_state)
+    print(b)
     print()
 
     print(b.to_fen())
+    assert b.to_fen() == "8/1kB1Rq2/N2r2Q1/b5n1/1p3Q2/2P1q3/3K4/8 b - - 31 121"
 
     success = b.from_fen(fen_pos="3Pp3/8/8/1K3k2/8/8/8/3P2p1 w - - 0 1")
     print(f"¿FUNCIONO LA IMPORTACION DE FEN 3Pp3/8/8/1K3k2/8/8/8/3P2p1 w - - 0 1?: {success}")
@@ -289,3 +390,6 @@ if __name__ == "__main__":
     print()
 
     print(b.to_fen())
+
+    print(b.square_to_index("e4"))
+    print(b.index_to_square(b.square_to_index("e4")))
