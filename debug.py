@@ -2,10 +2,10 @@ def print_board_state(board_state: int) -> None:
     '''Recibe un `int` con el formato de `board_state` y lo imprime
     para verificar que el formato esté correcto.
     
-    El formato es:
-    Bit 0: Turno (0 = blancas, 1 = negras);
-    Bits 1-4: Derechos de enroque (KQkq, 1 = puede, 0 = no puede);
-    Bits 5-10: Casilla de en passant (0-63, 0 = ninguna);
+    El formato es:\n
+    Bit 0: Turno (0 = blancas, 1 = negras);\n
+    Bits 1-4: Derechos de enroque (KQkq, 1 = puede, 0 = no puede);\n
+    Bits 5-10: Casilla de en passant (0-63, 0 = ninguna);\n
     Bits 11-16: Halfmove clock (0-50).'''
 
     print("Juegan las", "negras" if (board_state & 1) else "blancas")
@@ -14,18 +14,18 @@ def print_board_state(board_state: int) -> None:
     k = board_state & 1 << 3
     q = board_state & 1 << 4
     print(
-        "Las blancas" + (" pueden enroncar" if K | Q else "") +
+        "Las blancas" + (" pueden enrocar" if K | Q else "") +
         (" en el lado del rey" if K else "") +
         (" y" if K and Q else "") +
         (" en el lado de la reina" if Q else "") +
-        (" no pueden enroncar" if not K and not Q else "")
+        (" no pueden enrocar" if not K and not Q else "")
     )
     print(
-        "Las negras" + (" pueden enroncar" if k | q else "") +
+        "Las negras" + (" pueden enrocar" if k | q else "") +
         (" en el lado del rey" if k else "") +
         (" y" if k and q else "") +
         (" en el lado de la reina" if q else "") +
-        (" no pueden enroncar" if not k and not q else "")
+        (" no pueden enrocar" if not k and not q else "")
     )
 
     en_passant_sq = board_state >> 5 & ((1 << 6) - 1)
@@ -37,6 +37,15 @@ def print_board_state(board_state: int) -> None:
           "o avance de peón")
     
     print(f"Estado encriptado: {format(board_state, 'b')}")
+
+def print_board(board: int) -> None:
+    '''Imprime un número binaro en su formato de _bitboard_.'''
+
+    bitboard = format(board, 'b').zfill(64)
+
+    print('    A B C D E F G H')
+    for rank in range(8):
+        print(8 - rank, '|', ' '.join(bitboard[8 * rank:8 * (rank + 1)]))
 
 if __name__ == "__main__":
     import random
