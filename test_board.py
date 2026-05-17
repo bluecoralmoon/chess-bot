@@ -8,26 +8,26 @@ def test_board():
     success = b.from_fen(fen_pos="rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
     print(f"¿FUNCIONO LA IMPORTACION DE FEN rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1?: {success}")
     print(b)
-    assert b.occupancy == 0xFFFF00000000FFFF
-    assert b.all_white == 0x000000000000FFFF
-    assert b.all_black == 0xFFFF000000000000
-    assert b.white_pawns == 0x000000000000FF00
-    assert b.black_pawns == 0x00FF000000000000
-    assert b.white_knights == 0x0000000000000042
-    assert b.black_knights == 0x4200000000000000
-    assert b.white_bishops == 0x0000000000000024
-    assert b.black_bishops == 0x2400000000000000
-    assert b.white_rooks == 0x0000000000000081
-    assert b.black_rooks == 0x8100000000000000
-    assert b.white_queens == 0x0000000000000010
-    assert b.black_queens == 0x1000000000000000
-    assert b.white_king == 0x0000000000000008
-    assert b.black_king == 0x0800000000000000
+    assert b.bitboards['occupancy'] == 0xFFFF00000000FFFF
+    assert b.bitboards['all_white'] == 0x000000000000FFFF
+    assert b.bitboards['all_black'] == 0xFFFF000000000000
+    assert b.bitboards['white_pawns'] == 0x000000000000FF00
+    assert b.bitboards['black_pawns'] == 0x00FF000000000000
+    assert b.bitboards['white_knights'] == 0x0000000000000042
+    assert b.bitboards['black_knights'] == 0x4200000000000000
+    assert b.bitboards['white_bishops'] == 0x0000000000000024
+    assert b.bitboards['black_bishops'] == 0x2400000000000000
+    assert b.bitboards['white_rooks'] == 0x0000000000000081
+    assert b.bitboards['black_rooks'] == 0x8100000000000000
+    assert b.bitboards['white_queens'] == 0x0000000000000010
+    assert b.bitboards['black_queens'] == 0x1000000000000000
+    assert b.bitboards['white_king'] == 0x0000000000000008
+    assert b.bitboards['black_king'] == 0x0800000000000000
     assert b.board_state == 30
 
     from debug import print_board, print_board_state
 
-    print_board(b.white_pawns)
+    print_board(b.bitboards['white_pawns'])
     print()
 
     b.visualize_board()

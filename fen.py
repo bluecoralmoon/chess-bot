@@ -9,6 +9,36 @@ Contiene varias funciones auxiliares para este propósito.
 from collections import deque
 import re
 
+PIECE_TO_FEN: dict = {
+    'white_pawns': 'P',
+    'white_knights': 'N',
+    'white_bishops': 'B',
+    'white_rooks': 'R',
+    'white_queens': 'Q',
+    'white_king': 'K',
+    'black_pawns': 'p',
+    'black_knights': 'n',
+    'black_bishops': 'b',
+    'black_rooks': 'r',
+    'black_queens': 'q',
+    'black_king': 'k'
+}
+
+PIECE_BITBOARDS = (
+    'white_pawns',
+    'white_knights',
+    'white_bishops',
+    'white_rooks',
+    'white_queens',
+    'white_king',
+    'black_pawns',
+    'black_knights',
+    'black_bishops',
+    'black_rooks',
+    'black_queens',
+    'black_king'
+)
+
 def to_fen(board) -> str:
     '''Transforma la posición actual a formato FEN y la retorna.'''
 
@@ -17,36 +47,15 @@ def to_fen(board) -> str:
     # Piezas
     contador = 0
     for sq in range(63, -1, -1):
-        if not board.occupancy & (1 << sq):
+        if not board.bitboards['occupancy'] & (1 << sq):
             contador += 1
         else:
             if contador != 0:
                 fen += str(contador)
             contador = 0
-            if (board.white_pawns & (1 << sq)):
-                fen += "P"
-            elif (board.white_knights & (1 << sq)):
-                fen += "N"
-            elif (board.white_bishops & (1 << sq)):
-                fen += "B"
-            elif (board.white_rooks & (1 << sq)):
-                fen += "R"
-            elif (board.white_queens & (1 << sq)):
-                fen += "Q"
-            elif (board.white_king & (1 << sq)):
-                fen += "K"
-            elif (board.black_pawns & (1 << sq)):
-                fen += "p"
-            elif (board.black_knights & (1 << sq)):
-                fen += "n"
-            elif (board.black_bishops & (1 << sq)):
-                fen += "b"
-            elif (board.black_rooks & (1 << sq)):
-                fen += "r"
-            elif (board.black_queens & (1 << sq)):
-                fen += "q"
-            elif (board.black_king & (1 << sq)):
-                fen += "k"
+            for bitboard in PIECE_BITBOARDS:
+                if board.bitboards[bitboard] & (1 << sq):
+                    fen += PIECE_TO_FEN[bitboard]
         
         if sq != 0 and sq % 8 == 0:
             if contador != 0:
@@ -141,36 +150,9 @@ def from_fen(board, fen_pos: str = '') -> bool:
         if el.isnumeric():
             square -= int(el)
         else:
-            if el in "pP":
-                if el.isupper():
-                    board.white_pawns |= 1 << square
-                else:
-                    board.black_pawns |= 1 << square
-            elif el in "nN":
-                if el.isupper():
-                    board.white_knights |= 1 << square
-                else:
-                    board.black_knights |= 1 << square
-            elif el in "bB":
-                if el.isupper():
-                    board.white_bishops |= 1 << square
-                else:
-                    board.black_bishops |= 1 << square
-            elif el in "rR":
-                if el.isupper():
-                    board.white_rooks |= 1 << square
-                else:
-                    board.black_rooks |= 1 << square
-            elif el in "qQ":
-                if el.isupper():
-                    board.white_queens |= 1 << square
-                else:
-                    board.black_queens |= 1 << square
-            elif el in "kK":
-                if el.isupper():
-                    board.white_king |= 1 << square
-                else:
-                    board.black_king |= 1 << square
+            for bitboard in PIECE_BITBOARDS:
+                if PIECE_TO_FEN[bitboard] == el:
+                    board.bitboards[bitboard] |= 1 << square
             if el != "/":
                 square -= 1
 
