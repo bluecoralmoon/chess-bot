@@ -39,6 +39,8 @@ PIECE_BITBOARDS = (
     'black_king'
 )
 
+INDEX_TO_PIECE = dict(enumerate(PIECE_BITBOARDS))
+
 def to_fen(board) -> str:
     '''Transforma la posición actual a formato FEN y la retorna.'''
 
