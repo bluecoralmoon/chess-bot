@@ -126,7 +126,6 @@ class Board:
         '''
         Deshace un movimiento con el formato de **Move**:
 
-
         _Bits 0-5: casilla de origen (0-63);_\n
         _Bits 6-11: casilla de destino (0-63);_\n
         _Bits 12-15: tipo de pieza (0-11 según el índice del bitboard);_\n
@@ -146,6 +145,32 @@ class Board:
         _Bits 11-16: Halfmove clock (0-50)._
         '''
 
+        try:
+            self.board_state = self.board_state_history.pop()
+        except IndexError:
+            print(f"{self.__class__.__name__} {id(self)} - UNMAKE_MOVE():",
+                  "¡No hay movimientos que deshacer!")
+            return
 
+        # Obtener los bits de N con índices en [a, b]
+        # = (N >> a) & ((1 << b - a + 1) - 1)
+        origin_sq = move & ((1 << 6) - 1) 
+        target_sq = (move >> 6) & ((1 << 6) - 1)
+        piece_type = (move >> 12) & ((1 << 4) - 1)
+        captured_piece = (move >> 16) & ((1 << 4) - 1)
+        move_type = (move >> 20) & ((1 << 2) - 1)
+        promotion_piece = (move >> 22) & ((1 << 2) - 1)
 
-        return NotImplemented
+        if move_type == 0:
+            self.bitboards[fen.INDEX_TO_PIECE[piece_type]] |= (1 << origin_sq)
+            self.bitboards[fen.INDEX_TO_PIECE[piece_type]] &= ~(1 << target_sq)
+            if captured_piece != 15:
+                self.bitboards[
+                    fen.INDEX_TO_PIECE[captured_piece]
+                ] |= (1 << target_sq)
+        elif move_type == 1:
+            raise NotImplementedError
+        elif move_type == 2:
+            raise NotImplementedError
+        elif move_type == 3:
+            raise NotImplementedError
